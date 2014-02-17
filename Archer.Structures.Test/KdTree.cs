@@ -138,14 +138,16 @@ namespace Archer.Structures.Test
             for (int i = 0; i < 45; i++)
             {
                 var itemToRemove = tree.First();
-                tree.Remove(itemToRemove);
+                Assert.True(tree.Remove(itemToRemove), 
+                    string.Format("Failed to remove node for item: X{0}, Y{1}", itemToRemove.X, itemToRemove.Y));
             }
             Assert.Equal(tree.Count(), tree.Count);
 
-            for (int i = 0; i < 45; i++)
+            for (int i = 0; i < 5; i++)
             {
                 var itemToRemove = tree.First();
-                tree.Remove(itemToRemove);
+                Assert.True(tree.Remove(itemToRemove), 
+                    string.Format("Failed to remove node for item: X{0}, Y{1}", itemToRemove.X, itemToRemove.Y));
             }
             Assert.Equal(50, tree.Count);
             Assert.Equal(tree.Count(), tree.Count);

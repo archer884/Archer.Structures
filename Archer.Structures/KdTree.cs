@@ -58,12 +58,11 @@ namespace Archer.Structures
         #region KdTree<TItem, TDimension>
         public KdTreeNode<TItem> Find(TItem item)
         {
-            return FindByDimensions(Dimensions(item));
-        }
+            if (item == null)
+                throw new ArgumentNullException("item");
 
-        public KdTreeNode<TItem> FindByDimensions(IList<TDimension> dimensions)
-        {
             var node = _root;
+            var dimensions = Dimensions(item);
             var depth = 0;
 
             IList<TDimension> nodeDimensions;
@@ -73,25 +72,25 @@ namespace Archer.Structures
             while (node != null)
             {
                 nodeDimensions = Dimensions(node.Item);
-                dimension = depth++ % dimensions.Count;
-                comparison = dimensions[dimension].CompareTo(nodeDimensions[dimension]);
-
-                if (comparison < 0)
-                {
-                    node = node.LeftChild;
-                    continue;
-                }
-                else if (comparison > 0)
-                {
-                    node = node.RightChild;
-                    continue;
-                }
-                else if (dimensions.SequenceEqual(nodeDimensions))
+                if (dimensions.SequenceEqual(nodeDimensions))
                 {
                     if (node.IsValid)
                         return node;
-                    else node = node.LeftChild;
+                    else return null;
                 }
+
+                dimension = depth % dimensions.Count;
+                comparison = dimensions[dimension].CompareTo(nodeDimensions[dimension]);
+
+                if (comparison <= 0)
+                {
+                    node = node.LeftChild;
+                }
+                else
+                {
+                    node = node.RightChild;
+                }
+                depth++;
             }
             return null;
         }
@@ -139,7 +138,9 @@ namespace Archer.Structures
                         throw new ArgumentException("An item with this key already exists in tree.");
                     else
                     {
+                        node.IsValid = true;
                         node.Item = item;
+                        _count++;
                         return;
                     }
                 }
@@ -209,19 +210,20 @@ namespace Archer.Structures
 
             nodeToRemove.IsValid = false;
             _invalidCount++;
+            _count--;
 
             if (_invalidCount > 0 && _invalidCount / _count > 0.5)
             {
                 var rng = new Random();
-                var validItems = EnumerateInOrder(_root, false).ToList();
+                var validItems = EnumerateInOrder(_root).ToList();
                 _root = null;
+                _count = 0;
 
                 foreach (var validItem in validItems.OrderBy(validItem => rng.Next(validItems.Count)))
                     this.Add(validItem);
 
                 _invalidCount = 0;
             }
-            _count--;
             return true;
         }
 
