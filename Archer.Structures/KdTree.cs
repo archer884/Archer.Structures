@@ -24,6 +24,7 @@ namespace Archer.Structures
         #endregion
 
         #region properties
+        private int _invalidCount = 0;
         private int _count = 0;
         public int Count
         {
@@ -89,7 +90,9 @@ namespace Archer.Structures
                 }
                 else if (dimensions.SequenceEqual(nodeDimensions))
                 {
-                    return node;
+                    if (node.IsValid)
+                        return node;
+                    else return null;
                 }
             }
             return null;
@@ -197,14 +200,21 @@ namespace Archer.Structures
             if (nodeToRemove == null)
                 return false;
 
-            var itemsToReAdd = EnumerateInOrder(nodeToRemove, false).ToList();
-            var rng = new Random();
-            nodeToRemove = null;
+            nodeToRemove.IsValid = false;
+            _invalidCount++;
 
-            foreach (var childItem in itemsToReAdd.OrderBy(childItem => rng.Next(itemsToReAdd.Count)))
+            if (_invalidCount > 0 && _invalidCount / _count > 0.5)
             {
-                this.Add(childItem);
+                var rng = new Random();
+                var validItems = EnumerateInOrder(_root, false).ToList();
+                _root = null;
+
+                foreach (var validItem in validItems.OrderBy(validItem => rng.Next(validItems.Count)))
+                    this.Add(validItem);
+
+                _invalidCount = 0;
             }
+            _count--;
             return true;
         }
 
@@ -220,7 +230,7 @@ namespace Archer.Structures
                 foreach (var item in EnumerateInOrder(node.LeftChild))
                     yield return item;
 
-            if (includeParent)
+            if (node.IsValid)
                 yield return node.Item;
 
             if (node.RightChild != null)

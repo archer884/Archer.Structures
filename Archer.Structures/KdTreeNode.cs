@@ -10,14 +10,16 @@ namespace Archer.Structures
     {
         #region internals
         public T Item { get; internal set; }
+        public bool IsValid { get; set; }
         public KdTreeNode<T> LeftChild { get; internal set; }
         public KdTreeNode<T> RightChild { get; internal set; } 
         #endregion
 
         #region constructors
-        public KdTreeNode() { }
+        public KdTreeNode() { IsValid = true; }
 
         public KdTreeNode(T item)
+            : this()
         {
             Item = item;
         }

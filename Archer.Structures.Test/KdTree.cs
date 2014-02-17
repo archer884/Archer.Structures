@@ -110,6 +110,9 @@ namespace Archer.Structures.Test
 
             tree.Add(new Point() { X = 101, Y = 101 });
             Assert.Equal(101, tree.Count);
+
+            tree.Remove(tree.Root.Item);
+            Assert.Equal(100, tree.Count);
         }
 
         [Fact]
