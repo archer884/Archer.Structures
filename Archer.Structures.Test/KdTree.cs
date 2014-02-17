@@ -155,11 +155,17 @@ namespace Archer.Structures.Test
         #endregion
 
         #region IEnumerable<T> tests
-        // do later
+        // Honestly, so much of the ICollection<T> stuff
+        // is based on IEnumerable<T>, the truth is that 
+        // if that crap passes, so will this.
         #endregion
 
         #region KdTree custom method tests
-        // do later
+        // The Find method, exposed to the public, is used
+        // in the Remove method for ICollection<T>, so it 
+        // won't be tested again here.
+
+
         #endregion
     }
 }
