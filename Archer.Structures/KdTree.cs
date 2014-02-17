@@ -187,47 +187,25 @@ namespace Archer.Structures
         public void CopyTo(TItem[] array, int arrayIndex)
         {
             var enumerator = GetEnumerator();
-            while (enumerator.MoveNext())
+            while (enumerator.MoveNext() && arrayIndex < array.Length)
                 array[arrayIndex++] = enumerator.Current;
         }
 
         public bool Remove(TItem item)
         {
-            var parent = (KdTreeNode<TItem>)null;
-            var node = _root;
-            var dimensions = Dimensions(item);
-            var depth = 0;
+            var nodeToRemove = Find(item);
+            if (nodeToRemove == null)
+                return false;
 
-            IList<TDimension> nodeDimensions;
-            int dimension;
-            int comparison;
+            var itemsToReAdd = EnumerateInOrder(nodeToRemove, false).ToList();
+            var rng = new Random();
+            nodeToRemove = null;
 
-            while(node != null)
+            foreach (var childItem in itemsToReAdd.OrderBy(childItem => rng.Next(itemsToReAdd.Count)))
             {
-                nodeDimensions = Dimensions(node.Item);
-                dimension = depth % dimensions.Count;
-                comparison = dimensions[dimension].CompareTo(nodeDimensions[dimension]);
-
-                if (comparison < 0)
-                {
-                    parent = node;
-                    node = node.LeftChild;
-                    depth++;
-                    continue;
-                }
-                else if (comparison > 0)
-                {
-                    parent = node;
-                    node = node.RightChild;
-                    depth++;
-                    continue;
-                }
-                else if (dimensions.SequenceEqual(nodeDimensions))
-                {
-
-                }
+                this.Add(childItem);
             }
-            return false;
+            return true;
         }
 
         public IEnumerator<TItem> GetEnumerator()
@@ -236,13 +214,14 @@ namespace Archer.Structures
                 yield return item;
         }
 
-        private IEnumerable<TItem> EnumerateInOrder(KdTreeNode<TItem> node)
+        private IEnumerable<TItem> EnumerateInOrder(KdTreeNode<TItem> node, bool includeParent = true)
         {
             if (node.LeftChild != null)
                 foreach (var item in EnumerateInOrder(node.LeftChild))
                     yield return item;
 
-            yield return node.Item;
+            if (includeParent)
+                yield return node.Item;
 
             if (node.RightChild != null)
                 foreach (var item in EnumerateInOrder(node.RightChild))

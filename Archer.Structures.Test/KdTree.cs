@@ -119,9 +119,19 @@ namespace Archer.Structures.Test
         }
 
         [Fact]
-        public bool Remove(int item)
+        public void Remove()
         {
-            throw new NotImplementedException();
+            var tree = GetTestTree();
+            var point = new Point() { X = 101, Y = 101 };
+            var rootNode = new Point() { X = 24, Y = 0 };
+
+            tree.Add(point);
+            Assert.True(tree.Contains(point));
+
+            tree.Remove(point);
+            Assert.False(tree.Contains(point));
+
+            Assert.True(tree.Contains(rootNode));
         }
         #endregion
 
