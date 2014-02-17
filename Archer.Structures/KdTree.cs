@@ -73,26 +73,24 @@ namespace Archer.Structures
             while (node != null)
             {
                 nodeDimensions = Dimensions(node.Item);
-                dimension = depth % dimensions.Count;
+                dimension = depth++ % dimensions.Count;
                 comparison = dimensions[dimension].CompareTo(nodeDimensions[dimension]);
 
                 if (comparison < 0)
                 {
                     node = node.LeftChild;
-                    depth++;
                     continue;
                 }
                 else if (comparison > 0)
                 {
                     node = node.RightChild;
-                    depth++;
                     continue;
                 }
                 else if (dimensions.SequenceEqual(nodeDimensions))
                 {
                     if (node.IsValid)
                         return node;
-                    else return null;
+                    else node = node.LeftChild;
                 }
             }
             return null;
@@ -136,7 +134,15 @@ namespace Archer.Structures
             {
                 nodeDimensions = Dimensions(node.Item);
                 if (dimensions.SequenceEqual(nodeDimensions))
-                    throw new ArgumentException("An element with the same key already exists in the tree.");
+                {
+                    if (node.IsValid)
+                        throw new ArgumentException("An item with this key already exists in tree.");
+                    else
+                    {
+                        node.Item = item;
+                        return;
+                    }
+                }
 
                 dimension = depth % dimensions.Count;
                 comparison = dimensions[dimension].CompareTo(nodeDimensions[dimension]);
@@ -180,6 +186,7 @@ namespace Archer.Structures
         {
             _root = null;
             _count = 0;
+            _invalidCount = 0;
         }
 
         public bool Contains(TItem item)
@@ -224,7 +231,7 @@ namespace Archer.Structures
                 yield return item;
         }
 
-        private IEnumerable<TItem> EnumerateInOrder(KdTreeNode<TItem> node, bool includeParent = true)
+        private IEnumerable<TItem> EnumerateInOrder(KdTreeNode<TItem> node)
         {
             if (node.LeftChild != null)
                 foreach (var item in EnumerateInOrder(node.LeftChild))

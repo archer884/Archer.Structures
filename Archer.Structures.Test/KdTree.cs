@@ -13,8 +13,8 @@ namespace Archer.Structures.Test
         #region support
         public class Point
         {
-            public int X { get; set; }
-            public int Y { get; set; }
+            public int X;// { get; set; }
+            public int Y;// { get; set; }
         }
 
         public class PointComparer : IEqualityComparer<Point>
@@ -133,8 +133,22 @@ namespace Archer.Structures.Test
 
             tree.Remove(point);
             Assert.False(tree.Contains(point));
+            Assert.True(tree.Contains(rootNode), "tree does not contain normal root node");
 
-            Assert.True(tree.Contains(rootNode));
+            for (int i = 0; i < 45; i++)
+            {
+                var itemToRemove = tree.First();
+                tree.Remove(itemToRemove);
+            }
+            Assert.Equal(tree.Count(), tree.Count);
+
+            for (int i = 0; i < 45; i++)
+            {
+                var itemToRemove = tree.First();
+                tree.Remove(itemToRemove);
+            }
+            Assert.Equal(50, tree.Count);
+            Assert.Equal(tree.Count(), tree.Count);
         }
         #endregion
 
